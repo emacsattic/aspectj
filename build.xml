@@ -1,0 +1,63 @@
+
+<project name="build-aspcecjtForEmacs" default="dist" basedir=".">
+
+	<property name="module.dir"
+	      location="${basedir}"/>
+	<property name="build.temp.dir"
+	      location="${module.dir}/aj-build"/>          
+
+  <target name="clean">
+    <delete quiet="on" dir="${build.temp.dir}"/>
+  </target>
+
+  <target name="dist">
+    <property name="version" value="1.1b2"/>
+    <filter token="build.version.short" value="${version}" />
+    <property name="emacs.dir"
+          location="${basedir}/emacs" />
+    <mkdir  dir="${build.temp.dir}"/>
+    <delete dir="${build.temp.dir}"/>
+    <mkdir  dir="${build.temp.dir}"/>
+
+    <antcall target="assemble">
+      <param name="emacs.name" value="aspectj-mode"/>
+    </antcall>
+    <antcall target="assemble">
+      <param name="emacs.name" value="ajdee"/>
+    </antcall>
+    
+    <copy todir="${build.temp.dir}/zip" filtering="on">
+      <fileset dir="${basedir}/dist"     excludes="*.gif"/>
+    </copy>
+
+    <copy todir="${build.temp.dir}/zip" filtering="off">
+      <fileset dir="${basedir}/dist"     includes="*.gif"/>
+    </copy>
+
+    <zip zipfile="${build.temp.dir}/AspectJForEmacs-${version}.zip">
+      <zipfileset dir="${build.temp.dir}/zip" 
+               prefix="AspectJForEmacs-${version}"/>
+    </zip>
+    <!--
+    <delete quiet="on">
+      <fileset dir="${build.temp.dir}"
+        excludes="AspectJForEmacs-${version}.zip"/>
+    </delete>
+    -->
+  </target>
+  
+  <target name="assemble"
+   description="assemble ${emacs.name} into ${emacs.name}-${version}.zip"> 
+    <mkdir  dir="${build.temp.dir}/${emacs.name}"/>    
+
+    <copy todir="${build.temp.dir}/zip" filtering="yes">
+      <fileset dir="${emacs.dir}" includes="${emacs.name}/**/*"
+          excludes="notes,CVS"/>
+    </copy>
+    <zip zipfile="${build.temp.dir}/${emacs.name}.zip">
+      <zipfileset dir="${build.temp.dir}/zip/${emacs.name}"
+               prefix="${emacs.name}-${version}"/>
+    </zip>
+  </target>
+  
+</project>
