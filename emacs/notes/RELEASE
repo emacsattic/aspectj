@@ -1,0 +1,46 @@
+1. Renumber version/release numbers in "all" files
+      CHANGES
+      aspectj-support.el
+2. Platform test
+	Unix: Solaris, Linux
+	Windows
+3. Testing
+    a. Emacs test (look for new Emacs-en, too)
+	    GNU Emacs
+	    NTEmacs (Windows GNU)
+	    XEmacs
+	    Windows XEmacs (win32)
+	    Cygnus XEmacs (?)
+    b. AJ feature test (spacewar scenario, minimum)
+	    inter-file navigation
+	    appearance
+    c. java-mode feature test (pure standalone, JDE not loaded)
+	    compile
+	    view (annotations)
+	    navigate (jump menu)
+    d. JDE feature test
+	    compile, build, make, javadoc
+	    view (annotations, help, javadoc)
+	    navigate (jump menu, speedbar, Classes menu)
+    e. Toggle AspectJ options, JDE mode options
+    f. Clean install (fresh .emacs, ajdeForEmacs, aspectj)
+	    consistent with instructions
+    g. check user guide (ajdeForEmacs.html)
+    	completeness
+	formatting
+		IE/Netscape
+		with/without style sheets
+4. Read WARNING, BUG, WGG markers
+	update as necessary
+5. Package checks
+	new JDE
+	defadvices
+	variable overrides
+6. Report Emacs/package bugs found
+7. Report aj tool bugs found
+8. Update
+	ajdeForEmacs.html 	new features
+	CHANGES 		all changes
+	README 			bugs, unsupported, new files, testing infra
+	sample files		new features, configs, packages, etc.
+9. Write release notes and send to Jim/Erik

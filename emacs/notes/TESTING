@@ -1,0 +1,231 @@
+This describes generic scenarios to exercise the AspectJ extensions to
+JDE mode and Java mode in emacs.  Spacewar compiled for demo.lst configuration
+is used as an example, but other programs should be used as well.
+
+Editor/Navigation Scenario for JDE
+----------------------------------
+Note: Java mode does not provide the speedbar, but if you perform the
+specified speedbar navigations below via the editor, the C-x C-j and
+Jump Menu actions should behave the same.  In Java mode, the default
+is for the annotations to be on, so the toggling test for annotations
+should be reversed.  The bottom-level entries in speedbar should match
+those in the Jump Menu (actually, Jump Menu currently may contain more because
+introductions show throughout the class, not just on header), and the counts
+in annotations should add up. Navigation actions on bottom-level speedbar
+entries and the Jump Menu should correspond as well.
+
+1. From a shell, run: emacs Ship.java
+	Listen for bells and check Messages; should be none if Ship.java
+	was compiled (with symbols) using ajc.  Otherwise, should get
+	"Could not find declarations file" error via symbol manager.
+
+2. Open speedbar via JDE menu (next several commands are on speedbar)
+
+3. Double-click on [+] in front of Ship.java
+	Sublist consisting of Ship and EnsureShipIsAlive should appear.
+	If Ship.java is not compiled, however, then should see ``backup''
+	view provided by (our enhanced) quick-Java parser from JDE.
+
+4. Double-click on (-) on EnsureShipIsAlive
+	Should see "+ static before".
+
+5. Double-click on "+ static before"
+	Should see 4 entries for Ship methods thrust, rotate, stop, fire,
+	which are advised by the static before advise in EnsureShipIsAlive.
+
+6. Double-click on "Ship: thrust(boo..."
+	Should navigate to declaration of method thrust
+
+7. Type "C-x C-j" (control-X control-J) in text buffer (cursor on thrust decl)
+	Should display menu of items "advising" thrust
+	(Actually, I have introductions for the class here as well)
+
+8. Mouse-2 click on "static before" entry (chord Mouse-1 Mouse-3 on Win mouse)
+	Should split window, with Ship.java buffer at bottom scrolled to
+	the static advice in EnsureShipIsAlive.
+
+9. With cursor on the static advice, and using AspectJ menu on window bar,
+   select "Jump Menu".
+	Should see same four entries as showing in speedbar for the advice.
+
+10. Move cursor to "class EnsureShipIsAlive" in text buffer and apply the
+    menu action again.
+	Should get an empty jump menu if compiled without Debug.java in build.
+
+11. In speedbar, double-click on [+] by Display.java
+	Should get entry for class Display, and text buffer should remain
+	unchanged.
+
+12. Double-click on Display entry proper (not the "(+)")
+	Buffer (probably the former Jump Menu buffer) should show the
+	Display class of Display.java.
+
+13. Double-click on (+) in front of Display entry
+	Should show list of fields (variables), methods, etc. of the
+	class, including three introductions and one after advice, each
+	with a "+" in front of them.
+
+14. Double-click on the first introduction
+	Should show two entries "{+} Targets" and "{+} Decls"
+
+15. Double-click on {+} in front of Decls
+	Should show "display" (well, if decl order is preserved by
+	SymbolManager)
+
+16. Double-click on "display"
+	Text buffer should navigate to the introduction of display
+	in Display.java.
+
+17. Double-click on {+} in front of Targets
+	Speedbar should display subitems for SWFrame and SWCanvas.
+
+18. Double-click on SWFrame item
+	Should open SWFrame.java in buffer, displaying class SWFrame
+	with cursor placed there.
+
+19. Type "C-x C-j" (control-X control-J) in buffer (cursor on SWFrame decl)
+	Should display Jump Menu in split buffer with one entry for an
+	introduction from Display.java.
+
+20. Mouse-2 click on that entry
+	Should replace Jump Menu buffer with Display.java buffer showing the
+	display introduction once again.
+	
+21. With AspectJ Menu, select "Add annotations"
+	Should add text to SWFrame.java showing where introductions
+	and advice have been added.  For example, SWFrame class header
+	should show [1 introducer] after it.  Annotations should not
+	be selectable or editable.
+
+22. With AspectJ Menu, select "Clear annotations"
+	Annotations should disappear without otherwise affecting text. 
+
+23. In speedbar, click on (+) in front of class Ship under Ship.java entry
+	Should get long list of entries.
+
+24. Examine "color1" entry
+	Should have "| |" in front of it.
+
+25. Double-click on "color1" (not the mark)
+	Should change text window to Display1.java and show an introduction
+	of field color1 into class Ship.
+
+26. Activate Jump Menu via C-x C-j or AspectJ menu
+	Should see a Jump Menu entry for Ship.
+	(Note that speedbar does not permit opening the introduction to
+	display the equivalent entry because color1 entry itself is listed
+	under the Ship class.)
+
+27. Mouse-2 on entry
+	 Should switch buffer to Ship.java, scrolled to Ship class.
+
+
+Editor/Navigation Scenario for JDE (compiled with debug.lst)
+-----------------------------------------------------------
+1. From a shell, run: emacs Ship.java
+
+2. Open speedbar via JDE menu (next several commands are on speedbar)
+
+3. Double-click on [+] in front of Debug.java
+	Should see classes Debug and InfoWin
+
+4. Double-click on (+) in front of class Debug
+	Should see a bunch of entries, including 9 advice entries at end.
+
+5. Double-click on first "static before after"
+	(If items haven't been reordered) should display
+	 static advice allMethodsCut() { ...
+	in buffer
+
+6. Double-click on + in front of this advice in speedbar
+	Should get *long* list of advised methods in sorted order.
+
+7. Examine fourth item on list, an advice on addKeyListener from class
+   Display (introduced into Game)
+	The entry, probably elided, should look something like:
+	     Dis..: addKeyListener(KeyListener)
+	The first part could be displayed as "Game", since this is in
+	fact a method introduced *by* Display, *into* Game.
+
+8. Double-click on the entry.
+	Should navigate to addKeyListener method definition in Display.
+
+9. Type C-x C-j (control-X control-J) on addKeyListener in text buffer
+	Should display Jump Menu with one entry for class Game.
+	(Note that in the future, this menu may also include entries
+	for the points-to from the allMethodsCut advice in class Debug.)
+
+10. Open Display.java/Display/introduction-on-Game via speedbar
+	Targets should be Game and Decls method should be addKeyListener.
+	(More generally, should match entries in Jump Menu.)
+
+
+Compilation Scenario
+--------------------
+This scenario assumes that "ajc" is the chosen compiler for JDE, the
+class directory is "..", and the Jde compile file specification is
+"-argfile demo.lst".
+
+1. From a shell, remove all .class and .ajsym files from spacewar directory
+
+2. From emacs, select "Compile" from the JDE menu
+	Compilation buffer should appear with the following text (the last
+	line appearing after a bit):
+
+		cd d:/aspectj/examples/spacewar/
+		ajc  -d .. -argfile demo.lst
+
+		Compilation finished at Thu Jan 20 14:29:00
+
+3. From the shell, get a listing of the files in the spacewar directory
+	.class and .ajsym files should appear for all files specified by
+	demo.lst with current date and time.  (I note that "Recompile" from
+	the Compile menu from the Compilation buffer runs make rather than
+	ajc.  This appears be a JDE bug, but I'm not sure.)
+
+4. Repeat 1-3 again, but choose "Build" instead
+	Behavior should be essentially identical.
+
+
+Editing Scenario
+----------------
+The goal here is to test the highlighting and indentation features of AJDE.
+(Much of the definition of AJ itself was in flux at the time this was written;
+some things may not make sense as written until AJ's syntax settles down.)
+
+1. From a shell, run "emacs Ship.java"
+	Definition of helmCommandsCut should have the following highlighting:
+	  (a) "crosscut" should have the type color (green).
+	  (b) "helmCommandsCut" should have the method definition color (blue).
+	  (c) parameter list should have parameter list coloring (green/amber).
+	  (d) in event spec, plain classes should be black, declarations of
+	      objects/signatures should appear like declarations. (This may
+	      not be exactly what is desired for highlighting, but is easy to
+	      define).
+
+2. Delete space in front of crosscut decl and then hit TAB
+	Decl should indent like others around it (e.g., 2 spaces)
+
+3 Scroll to bottom of Ship.java (alt-shift >)
+	Definition of advice on Ship.helmCommandsCut should have the following
+	highlighting:
+	  (a) "static" and "advice" should appear in type color (green)
+	  (b) Ship.helmCommandsCut() should have amber (var def'n) highlighting
+	      on Ship and nothing on helmCommandsCut() (What is probably
+	      desired and we'll get when AJ syntax settles down is blue
+	      highlighting.)
+	  (c) "before" should highlight in control-statement color (fuscia).
+
+4. Delete all formatting on class body EnsureShipIsAlive, select edited body
+   and run command M-x indent-region
+	Code should reformat with nice indentation: everything is reindented
+        inside the class, advice body indents further, etc.
+	
+5. Open Display.java (C-x C-f Display.java), scroll/search to introduction(s)
+	Definition of introduction should have the following highlighting:
+	  (a) "introduction" should be in type color (green).
+	  (b) Class spec should not be highlighted.
+	  (c) Body should display as any body.
+
+6. Repeat indentation experiment on Display.java (perhaps whole file), or
+   try Debug.java for a real treat.

@@ -1,0 +1,198 @@
+
+Design Issues:
+--------------
+(7) metaphor (jumps, weaves, etc.); dynamic semantics will be killer
+	how to capture (compiler may be too imprecise)
+	how to present (don't want code-transformation semantics)
+(9) Do we want to be able to navigate from a pointcut decl to targets?
+    (This would be analogous to how introductions list targets)  SymbolManager
+    does not currently provide targets.
+    Do we want to see that advice targets are ``due to'' decl'd crosscut?
+(14) do we want to hierarchicalize vars, methods, etc. like jde speedbar does?
+	Superclasses/Interfaces
+	Variables (shows introduced variables)
+	Methods (shows advice under methods)
+	Introductions
+	Advice
+	C-cuts
+(21) decide what class tag should be on advice on introduced method
+     (See intro of addKeyListener into Game by Display).  For example, in
+     Debug.java you get the three entries:
+	Display1: paint(Display1, Graphics)
+	Display1: paint(Display1, Graphics)
+	Display1: paint(Display1, Graphics)
+     which are three methods introduced by Display1 into three other
+     classes.  How about:
+	Display1: Bullet.paint(Display1, Graphics)
+	Display1: Ship.paint(Display1, Graphics)
+	Display1: EnergyPacket.paint(Display1, Graphics)
+     Of course, the signature of the crosscut *implies* the three classes
+     above, but only implies them.  We could also have:
+	Bullet: paint(Display1, Graphics)
+	Ship: paint(Display1, Graphics)
+	EnergyPacket: paint(Display1, Graphics)
+(24b) maybe introductions should not show in jump menu when cursor is on a
+      method. Debug's advice currently says: Display : addKeyListener(...)
+(33) support alternate builds (find .lst files and list on AspectJ menu)
+(34) delete obsolete .ajsym files (for files left out of current build)?
+     could be hard, because deleting files that are *not* named
+(36) integrate with ajdoc?
+(38) restructure advice entries in speedbar to be symmetric with intro's
+     (see item 14)
+(41) show out superclass (and interface) reference(s) (see item 14)
+(42) filtering of ``uninteresting'' crosscuts
+
+ToDo:
+-----
+(11) be able to get rid of aspectj menu when turn of aspectj mode
+(18) test with Unix latest XEmacs and Linux (latter seems OK)
+(42) avoid unnecessary calls to SBSM.fetchDeclarations
+(45) compute jumps on demand (reduce start-up time, get rid of race condition)
+     aspectj-get-overlays; protect overlays-* commands
+     race condition may not disappear if speedbar display automatic?
+     but only runs when open file via button
+(46) clearing jumps should "clear" C-x C-j command
+(47) testing lisp script that runs emacs commands and checks outputs
+(50) have lines containing overlays be refreshed after every change  (Emacs
+     does good job with aligning overlays, but not keeping text upto date.)
+     See after-change-functions.
+(56) have cursor go to *target* buffer on navigation on jump menu?
+(57) version variable (check, print, etc.)
+(58) aspectj-test should not put data in *scratch* buffer
+(61) robustness (what do early adopters use?)
+	XEmacs 21 (Unix only?  Check JDE 2.1.8)
+	Linux
+(62) Need AJ fall-back mode using bovinator (semantic) package.  Old imenu
+     impl (see our old, modified jde.el) no longer applies.
+
+Problems:
+---------
+(8) getTargets vs. getPointedToBy asymmetry
+    e.g., Ship.java "Display1: introduction" and color1/paint
+(53) introduced methods should also show advises; they don't show in
+     introducing or introduced class, but do show in advising class.  Holds
+     for both speedbar and Jump Menu; this relates to proper treatment of
+     points-to/by, which is not symmetric in handling.  For example, see
+     how Debug advises with advice on allMethodsCut(), thus reaching Display1's
+     introduction of paint() into Ship.  This information is not currently
+     available from SymbolManager (or at least StringBasedSymbolManager; see
+     the recurse test in printDecl()).
+
+Features:
+---------
+(1) continuous jump-menu mode: running update of jump menu (this will prove to
+    be hard unless can get a navigational equivalent of after-change-functions)
+
+Dependent Package Problems: ("*" means workaround has been found)
+---------------------------
+(1) bsh won't fork properly under NT/XEmacs (21.1.6)
+*(2) bsh is dependent on jde's variables and macros
+    (see end of aspectj-support.el)
+(3) speedbar seems to have a scrolling bug, scrolling to top on many "open"
+    commands.
+*(4) beanshell.el must be compiled to avoid recursion overruns on Solaris.
+*(5) race conditions in bsh start-up cause problems by mixing bsh's start-up
+    output with output of first call to bsh. (Solved for Unix, but may need
+    to enable for Windows, too.  See bottom of aspectj-support.el)
+(6) JDE compile/build doesn't seem to scroll to absolute bottom of buffer.
+(7) JDE is old and doesn't support newest jdb syntax (recheck for JDE 2.1.8)
+(8) JDE/Java-mode definition of whitespace does not include comments.
+(9) Is there an easy way to add button types to speedbar w/o a lot of copying?
+
+Resolved
+--------
+X(1) make aj calls in JDE a call from a hook
+       speedbar-tag-find
+         speedbar-visiting-tag-hook
+       speedbar-tag-file
+    Facts:
+       speedbar-tag-file has some hairy logic already to choose between two
+       methods of generating the tags; gregor has added a third.  There is a
+       need for a general mechanism (according to the code, kind of a cascading
+       hierarchy of "if I didn't find anything then use the next weaker version"
+       So in our case aspectj-fetch-dynamic-imenu would try to run first, then
+       speedbar-fetch-dynamic-imenu, and finally speedbar-fetch-dynamic-etags.
+       This is more like a fault recovery or class hierarchy mechanism than
+       anything else.  Actually, it seems that each function really does two
+       separable things, determining if they apply and applying them.  The if
+       part may be determined by the data contents (as in AJ) or by a mode flag
+       as in the case of generic speedbar.  So the question is what are the
+       conventions for emacs?
+*(2) make aj-mode java-mode
+*(3) mode documentation
+*(4) AspectJ menu?
+X(5) key-bindings for setup/clear annotations?
+X(6) hooks for speedbar sorting are violated by .el extensions
+    (aspectj-convert-decl)
+X(8) increase amount of information displayed in speedbar
+	less eliding (see aspectj-shorten)
+	example text shown in trivial entries
+X(9) extend doc to note use of parens vs. curly for ?? advised methods
+X(10) Have spec-file-missing message name the spec file!
+X(12) have AJDE recompute entries when menu widened? [user invokes refresh]
+(13) get those little ">" things on clickable speedbar entries [incompatible]
+X(15) get rid of "java.lang.Error" from SymbolManagerForEmacs.java
+(17) get rid of prompt-for-quit on bsh process [impossible?]
+X(20) sort advice lists
+
+(24) Multiple intro entries may appear in jump menu pointing to same
+     intro because intro has two decls in it.  Check to see if should
+     be filtering entries or getting the mark on the sub-decls. [misunderstood]
+X(25) Expand trouble-shooting to include load failure due to versioning.
+X(26) Make sure doc's symbology explanation distinguishes points-to/by
+X(27) check bsh-missing error (still works OK) [and can't handle better]
+X(30) defcustoms for annotations
+X(32) user guide presence
+X(35) figure out when speedbar asks aj-mode for refresh (speedbar-refresh)
+X(39a) string overlays ``issue'' at top of Ship.java: annotation in comment
+X(39b) overlays ``issue'' in Ship.java: missing overlay when scrolled to top
+       [disappeared]
+*(40) new signatures may be too long for jump menu
+(43) compile via bsh? [little benefit]
+*(47) get eval-when's right for top-level stuff so will work with compilation
+      [left them all alone, which means, I believe eval-when-load]
+X(1) If aspectj-mode is enabled on start-up, missing-declarations error shows as:
+	File mode specification error: (error "\"java.lang.Error: Can't find....\"")
+X(2) Missing declaration error is ``overwritten'' by Fontifying message and
+    generally just cleared.
+X(3) In JDE missing declarations file disables class display in speedbar.
+X(4) Failure modes for missing SymbolManagerForEmacs.class is infuriating.
+X(5) JDE is loaded for aspectj-mode only because it wants beanshell.
+X(7) bash-2.02 appears to have problems with @-files that have indirection,
+    such as demo.lst in spacewar (file-not-found error coming from ajc?).
+    Demonstrate with the following, both from examples directory:
+	ajc @spacewar/demo.lst
+	ajc @swcoord.lst
+*(6) introductions (and advice?) don't produce full decls, but strings;
+    without full decls, we can't get a mark.  Jim needs to write function
+    to support aspectj-decl-declaring-type-decl.
+*(51) introduction "targets" points to introduction, not targets (is this the
+     same as 6?) (Yes, it is, apparently.  We have a file name, line, and col,
+     and we need to be able to create a mark from that.  I don't understand
+     why we need a full decl; maybe we do have it now.)
+X(55) stop the bell from ringing when going into default mode
+*(48) highlighting doesn't work on qualified identifiers
+     (e.g. Ship.helmcrosscut()), and maybe stuff in crosscut decls shouldn't
+     be highlighted either; check after lang. design settles down.
+X(28) get fall-back mode to look more like standard-mode [no, want to make
+      difference obvious!]
+X(16) check for JDE 2.1.6 [upgraded to 2.1.8]
+*(19) make sure pointed-to-bys work on aspect code (after Jim fixes) [?]
+X(31) update aspectj-support.el, etc. to use new speedbar version:
+	supports alternate buttons, better hooks
+*(37) distinguish decl file not found and serialized object out of date
+     [this is a problem only when upgrading.]
+*(44) check if setting of custom vars in speedbar.el ought to be done with
+	custom-local-buffer set to the current buffer [obsolete]
+*(49) keep line numbers accurate by tracking changes; see
+     after-change-functions [not needed with marks?]
+X(59) speedbar fallback mode for AJ gets confused by method signatures
+     in pointcuts, thinking they're methods. [obsolete]
+X(60) AspectJ mode menu can get screwed up if turn mode off and on again.
+      
+
+
+
+
+
+
