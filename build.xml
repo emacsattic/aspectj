@@ -1,20 +1,32 @@
 
-<project name="build-aspcecjtForEmacs" default="dist" basedir=".">
+<project name="build-aspectjForEmacs" default="dist" basedir=".">
 
-	<property name="module.dir"
-	      location="${basedir}"/>
-	<property name="build.temp.dir"
-	      location="${module.dir}/aj-build"/>          
+    <target name="init-properties"
+         unless="init-properties.done">
+		<property name="module.dir"     location="${basedir}"/>
+	    <property name="emacs.dir"      location="${basedir}/emacs" />
+		<property name="build.temp.dir" location="${module.dir}/aj-build"/>          
+	    <property name="build.version"     value="1.1b2"/>
+	    <property name="web.pattern"       
+	             value="index.html,index_files/*,index_files"/>
+		<property name="binary.pattern" 
+		         value="**/*.css,**/*.gif,**/*.jar,**/*.tgz,**/*.zip"/>
+		<tstamp>
+			<format property="build.date" 
+		    	     pattern="EEEE MMM d, yyyy"
+		        	 timezone="PST"/>
+		</tstamp>
+		<property name="init-properties.done" value="done"/>
+	</target>
 
-  <target name="clean">
+
+  <target name="clean" depends="init-properties">
     <delete quiet="on" dir="${build.temp.dir}"/>
   </target>
 
-  <target name="dist">
-    <property name="version" value="1.1b2"/>
-    <filter token="build.version.short" value="${version}" />
-    <property name="emacs.dir"
-          location="${basedir}/emacs" />
+  <target name="dist"  depends="init-properties">
+    <filter token="build.version.short" value="${build.version}" />
+    
     <mkdir  dir="${build.temp.dir}"/>
     <delete dir="${build.temp.dir}"/>
     <mkdir  dir="${build.temp.dir}"/>
@@ -26,37 +38,66 @@
       <param name="emacs.name" value="ajdee"/>
     </antcall>
     
+    <copy todir="${build.temp.dir}/zip">
+      <fileset dir="${basedir}/dist"     includes="${binary.pattern}"
+          excludes="${web.pattern}"/>
+    </copy>
+	<filter token="build.version" value="${build.version}"/>
+	<filter token="build.date" value="${build.date}"/>
     <copy todir="${build.temp.dir}/zip" filtering="on">
-      <fileset dir="${basedir}/dist"     excludes="*.gif"/>
+      <fileset dir="${basedir}/dist"     excludes="${binary.pattern},${web.pattern}"/>
     </copy>
 
-    <copy todir="${build.temp.dir}/zip" filtering="off">
-      <fileset dir="${basedir}/dist"     includes="*.gif"/>
-    </copy>
-
-    <zip zipfile="${build.temp.dir}/AspectJForEmacs-${version}.zip">
+    <zip zipfile="${build.temp.dir}/AspectJForEmacs-${build.version}.zip">
       <zipfileset dir="${build.temp.dir}/zip" 
-               prefix="AspectJForEmacs-${version}"/>
+               prefix="AspectJForEmacs-${build.version}"/>
     </zip>
     <!--
     <delete quiet="on">
       <fileset dir="${build.temp.dir}"
-        excludes="AspectJForEmacs-${version}.zip"/>
+        excludes="AspectJForEmacs-${build.version}.zip"/>
     </delete>
     -->
   </target>
   
+	<target name="webdist" depends="dist,init-properties"
+	 description="build web page docs">
+	    <property name="web.dist.dir"
+	          location="${build.temp.dir}/web-dist"/>
+		<mkdir dir="${web.dist.dir}"/>
+		<delete dir="${web.dist.dir}"/>
+		<mkdir dir="${web.dist.dir}"/>
+		<copy todir="${web.dist.dir}">
+			<fileset dir="${module.dir}/dist"     includes="${binary.pattern}"/>
+			<fileset dir="${module.dir}/releases" includes="r1.0.6/*"/>
+			<fileset dir="${build.temp.dir}" 
+			    includes="AspectJForEmacs-${build.version}.zip"/>
+		</copy>
+		<filter token="build.version" value="${build.version}"/>
+		<filter token="build.date" value="${build.date}"/>
+		<copy todir="${web.dist.dir}" filtering="on">
+			<fileset dir="${module.dir}/dist"      excludes="${binary.pattern}"/>
+			<fileset dir="${emacs.dir}"
+			    includes="aspectj-mode/*,ajdee/*"/>
+		</copy>
+
+		<echo message="scp ${web.dist.dir}/* 
+           username@shell.sourceforge.net:/home/groups/a/as/aspectj4emacs/htdocs"/>
+	</target>
+  
   <target name="assemble"
-   description="assemble ${emacs.name} into ${emacs.name}-${version}.zip"> 
+   description="assemble ${emacs.name} into ${emacs.name}.zip"> 
     <mkdir  dir="${build.temp.dir}/${emacs.name}"/>    
 
-    <copy todir="${build.temp.dir}/zip" filtering="yes">
+	<filter token="build.version" value="${build.version}"/>
+	<filter token="build.date" value="${build.date}"/>
+    <copy todir="${build.temp.dir}/zip" filtering="on">
       <fileset dir="${emacs.dir}" includes="${emacs.name}/**/*"
           excludes="notes,CVS"/>
     </copy>
     <zip zipfile="${build.temp.dir}/${emacs.name}.zip">
       <zipfileset dir="${build.temp.dir}/zip/${emacs.name}"
-               prefix="${emacs.name}-${version}"/>
+               prefix="${emacs.name}"/>
     </zip>
   </target>
   

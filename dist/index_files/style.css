@@ -1,0 +1,108 @@
+A:link {
+	COLOR: #4756ac
+}
+A:visited {
+	COLOR: #60657b
+}
+A:hover {
+	COLOR: red
+}
+BODY {
+	MARGIN-LEFT: 10px; BACKGROUND-COLOR: white
+}
+P {
+	FONT: 13px Verdana, Arial, Helvetica, sans-serif; MARGIN-LEFT: 10px; MARGIN-RIGHT: 10px
+}
+PRE {
+	FONT: 13px "Courier", sans-serif
+}
+B {
+	FONT-WEIGHT: bold
+}
+STRONG {
+	FONT-WEIGHT: bold
+}
+CODE {
+	FONT: 13px "Courier", sans-serif
+}
+H1 {
+	FONT: bold 20px Verdana, Helvetica, sans-serif; MARGIN-LEFT: 10px; COLOR: black
+}
+H2 {
+	FONT: bold 18px Verdana, Arial, Helvetica, sans-serif; MARGIN-LEFT: 10px; COLOR: black
+}
+H3 {
+	FONT: bold 16px Verdana, Arial, Helvetica, sans-serif; MARGIN-LEFT: 10px; COLOR: black
+}
+H4 {
+	FONT: bold 13px Verdana, Arial, Helvetica, sans-serif; MARGIN-LEFT: 10px; COLOR: black
+}
+LI {
+	FONT: 13px Verdana, Arial, Helvetica, sans-serif
+}
+UL {
+	FONT: 13px Verdana, Arial, Helvetica, sans-serif
+}
+OL {
+	FONT: 13px Verdana, Arial, Helvetica, sans-serif
+}
+DT {
+	FONT: bold 13px Verdana, Arial, Helvetica, sans-serif
+}
+DD {
+	FONT: 13px Verdana, Arial, Helvetica, sans-serif
+}
+TD {
+	FONT: 13px Verdana, Arial, Helvetica, sans-serif
+}
+TH {
+	FONT: bold 13px Verdana, Arial, Helvetica, sans-serif; TEXT-ALIGN: center
+}
+INPUT {
+	FONT: 10px Verdana, Arial, Helvetica, sans-serif
+}
+.navBarSection {
+	FONT: bold 10px Verdana, Arial, Helvetica, sans-serif
+}
+.navBarSubSection {
+	FONT: 10px Verdana, Arial, Helvetica, sans-serif
+}
+.fancyHeading {
+	FONT: 20px Chantilly, Arial, Helvetica, sans-serif; MARGIN-LEFT: 10px; COLOR: #6f7a92; MARGIN-RIGHT: 10px
+}
+.indentedParagraph {
+	FONT: 13px Verdana, Arial, Helvetica, sans-serif; MARGIN-LEFT: 30px; MARGIN-RIGHT: 10px; TEXT-ALIGN: left
+}
+.footer {
+	FONT: 10px Verdana, Arial, Helvetica, sans-serif; COLOR: #888888; TEXT-ALIGN: left
+}
+.figureTitle {
+	FONT: 13px Verdana, Arial, Helvetica, sans-serif; TEXT-ALIGN: center
+}
+.copyrightNotice {
+	FONT: 10px Verdana, Arial, Helvetica, sans-serif; COLOR: #999999
+}
+.smallHeading {
+	FONT: bold 13px Verdana, Arial, Helvetica, sans-serif
+}
+.tinyHeading {
+	FONT: bold 11px Verdana, Arial, Helvetica, sans-serif
+}
+.newsText {
+	FONT: 11px Verdana, Arial, Helvetica, sans-serif
+}
+.smallParagraph {
+	FONT: 11px Verdana, Arial, Helvetica, sans-serif
+}
+.code {
+	
+}
+.command {
+	
+}
+.codeindent {
+	MARGIN-LEFT: 30px
+}
+.commandindent {
+	MARGIN-LEFT: 30px
+}
